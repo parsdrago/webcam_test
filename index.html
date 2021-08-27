@@ -28,6 +28,10 @@
                 video.src = window.URL.createObjectURL(evt.stream[0]);
             })
 
+            pc.onicecandidate = (evt) => {
+                console.log(evt);
+            }
+
             async function createPC() {
                 const offer = await pc.createOffer();
                 await pc.setLocalDescription(offer);
