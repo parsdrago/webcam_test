@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <button id='createsdp'>CREATE SDP</button><br>
+        <textarea id='sdp' rows='10'></textarea>
+        <hr>
+        <textarea id='sdp2' rows='10'></textarea><br>
+        <button id='createAnswer'>CREATE ANSWER SDP</button><br>
+        <textarea id='sdp3' rows='10'></textarea>
+        <hr>
+        <textarea id='sdp4' rows='10'></textarea><br>
+        <button id='recieveAnswer'>RECIEVE ANSWER SDP</button>
+
+        <hr>
+        <button id='send'>SEND MESSAGE</button>
+
+        <hr>
+        <video id='video' autoplay></video>
+
+        <script>
+            const pc = new RTCPeerConnection({"iceServers":[]});
+
+            pc.addEventListener('track', (evt) => {
+                console.log('stream');
+                video.src = window.URL.createObjectURL(evt.stream[0]);
+            })
+
+            async function createPC() {
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                sdp.textContent = offer.sdp;
+            }
+            createsdp.onclick = createPC;
+
+            async function createAnswerSdp() {
+                const offer = sdp2.value;
+                await pc.setRemoteDescription({
+                    sdp: offer,
+                    type: 'offer'
+                });
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                sdp3.textContent = answer.sdp;
+            }
+            createAnswer.onclick = createAnswerSdp;
+
+            async function recieveAnswerSdp() {
+                const answer = sdp4.value;
+                await pc.setRemoteDescription({
+                    sdp: answer,
+                    type: 'answer'
+                });
+            }
+            recieveAnswer.onclick = recieveAnswerSdp;
+
+            send.addEventListener('click', async function() {
+                console.log('media setyup');
+                const stream = await navigator.mediaDevices.getUserMedia({video:true});
+                pc.addStream(stream);
+                console.log(pc.stream);
+                console.log('media setyup');
+            })
+        </script>
+    </body>
+</html>
